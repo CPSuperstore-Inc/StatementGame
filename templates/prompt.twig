@@ -1,0 +1,22 @@
+{% extends "base.twig" %}
+{% block title %}Prompt{% endblock %}
+{% block body %}
+
+	<h3 class="body-padding">{{ question["text"] }}</h3>
+
+    <form action="/round/{{ rid }}" method="POST">
+        <p>You are {% if alien %}the alien. Your question is different from the humans.{% else %}not the alien. Your question is different from the aliens.{% endif %}</p>
+        <button type="submit" class="btn btn-primary inflate btn-block" style="background-color: #00FF00; border-color: #00FF00" onclick="document.getElementById('response').value='0'">Strongly Agree</button>
+        <button type="submit" class="btn btn-primary inflate btn-block" style="background-color: #1ABF26; border-color: #1ABF26" onclick="document.getElementById('response').value='1'">Agree</button>
+        <button type="submit" class="btn btn-primary inflate btn-block" style="background-color: #33804D; border-color: #33804D" onclick="document.getElementById('response').value='2'">Neutral</button>
+        <button type="submit" class="btn btn-primary inflate btn-block" style="background-color: #4D4073; border-color: #4D4073" onclick="document.getElementById('response').value='3'">Disagree</button>
+        <button type="submit" class="btn btn-primary inflate btn-block" style="background-color: #660099; border-color: #660099" onclick="document.getElementById('response').value='4'">Strongly Disagree</button>
+        <input type="hidden" id="response" name="response">
+    </form>
+
+<script type="text/javascript">
+	startGameRunningCheckThread({{ game_id }});
+</script>
+
+{% endblock %}
+{% block foot %}{% endblock %}

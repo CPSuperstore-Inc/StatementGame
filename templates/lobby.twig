@@ -1,0 +1,61 @@
+{% extends "base.twig" %}
+{% block title %}Game Lobby{% endblock %}
+{% block body %}
+
+    <header class="jumbotron my-4">
+      <h1 class="display-3">Game Lobby</h1>
+      <p class="lead">Use The Code: <code>{{ game["code"] }}</code> To Join This Game! The Code Will Expire Once You Join The Game!</p>
+      <a href="/round/1" class="btn btn-primary btn-lg">Start Game</a>
+    </header>
+
+    <h3>Joined Players</h3>
+     <ul class="list-group list-group-flush">
+      <li class="list-group-item" v-for="m in members">${ m["name"] }</li>
+    </ul> 
+
+    <a class="btn btn-danger btn-block" onclick="return confirmEnd();" href="/endGame/{{ game["id"] }}">End Game</a>
+
+    <script type="text/javascript">
+        function confirmEnd(){
+            return confirm("Are you sure you want to end the game? This can not be undone!");
+        }
+    </script>
+
+    <script type="text/javascript">
+      startGameRunningCheckThread({{ game["id"] }});
+    </script>
+
+    <script type="text/javascript">
+        Vue.component('modal', {
+            template: '#modal-template'
+        })
+    
+        var app = new Vue({
+            el: '#app',
+            delimiters: ["${","}"],
+            data: {
+                members: []
+            },
+            methods: {
+                updateMembers: function(){
+                    var parent = this;
+                    var xhttp = new XMLHttpRequest();
+                      xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                          parent.members = JSON.parse(this.responseText);
+                        }
+                      };
+                      xhttp.open("GET", "/api/game-members/{{ game["id"] }}", true);
+                      xhttp.send();
+                }
+            },
+            mounted: function () {
+              window.setInterval(() => {
+                this.updateMembers();
+              }, 2000);
+              this.updateMembers();
+            }
+        });
+	</script>
+{% endblock %}
+{% block foot %}{% endblock %}

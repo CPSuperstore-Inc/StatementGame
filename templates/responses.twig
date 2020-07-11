@@ -1,0 +1,88 @@
+{% extends "base.twig" %}
+{% block title %}Round Responses{% endblock %}
+{% block body %}
+    <h3 class="body-padding">Human Question: {{ question["text"] }}</h3>
+    <p>You are {% if alien %}the alien{% else %}not the alien{% endif %}</p>
+    <h4>Responses:</h4>
+
+    <table class="table table-hover">
+        <tr v-for="r in responses">
+            {% if not alien %}<td><button v-if="uuid != r['player']" class="btn btn-danger" @click="accusePlayer(r)">Accuse</button></td>{% endif %}
+            <td>${ r["name"] }</td>
+            <td><button class="btn btn-primary inflate btn-block" :style="getColor(r['level'])">${ getLevel(r["level"]) }</button></td>
+        </tr>
+    </table>
+
+    <button class="btn btn-primary btn-block" onclick="window.location.href='/round/{{ rid | int + 1 }}'" :disabled="responses.length < playerCount">Next Round</button>
+    <a class="btn btn-danger btn-block" onclick="return confirmEnd();" href="/endGame/{{ round["game"] }}">End Game</a>
+
+    <script type="text/javascript">
+        function confirmEnd(){
+            return confirm("Are you sure you want to end the game? This can not be undone!");
+        }
+    </script>
+
+    <script type="text/javascript">
+        startGameRunningCheckThread({{ round["game"] }});
+    </script>
+
+    <script type="text/javascript">
+        var app = new Vue({
+            el: '#app',
+            delimiters: ["${","}"],
+            data: {
+                responses: [],
+                playerCount: {{ player_count }},
+                uuid: {{ session["id"] }}
+            },
+            methods: {
+                getResponses: function(){
+                    var parent = this;
+                    var xhttp = new XMLHttpRequest();
+                      xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4 && this.status == 200) {
+                          parent.responses = JSON.parse(this.responseText);
+                        }
+                      };
+                      xhttp.open("GET", "/api/get-answers/{{ round["id"] }}", true);
+                      xhttp.send();
+                },
+                accusePlayer:function(p){
+                    if(confirm("Are you sure you want to accuse " + p["name"] + "?\nThis will automatically end the game!")){
+                        if(p["alien"] == 1){
+                            alert("You were correct! Congratulations!");
+                        } else {
+                            alert("You were incorrect! Congratulations!");
+                        }
+                        window.location.href="/endGame/{{ round["game"] }}";
+                    }
+                },
+                getLevel: function(id){
+                    return {
+                        0: "Strongly Agree",
+                        1: "Agree",
+                        2: "Neutral",
+                        3: "Disagree",
+                        4: "Strongly Disagree" 
+                    }[id]
+                },
+                getColor: function(id){
+                    return {
+                        0: style="background-color: #00FF00; border-color: #00FF00",
+                        1: style="background-color: #1ABF26; border-color: #1ABF26",
+                        2: style="background-color: #33804D; border-color: #33804D",
+                        3: style="background-color: #4D4073; border-color: #4D4073",
+                        4: style="background-color: #660099; border-color: #660099"
+                    }[id]
+                }
+            },
+            mounted: function () {
+              window.setInterval(() => {
+                this.getResponses();
+              }, 2000);
+              this.getResponses();
+            }
+        });
+	</script>
+{% endblock %}
+{% block foot %}{% endblock %}

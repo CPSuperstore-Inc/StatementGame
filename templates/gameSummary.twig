@@ -1,0 +1,75 @@
+{% extends "base.twig" %}
+{% block title %}Game Summary{% endblock %}
+{% block body %}
+    <header class="jumbotron my-4">
+      <h1 class="display-3">Game Summary</h1>
+      <p class="lead">Here is a list of all the questions and answers in the game. Under that, you can see the prompt the alien received and responded with.</p>
+      <a href="/?name={{ old_name }}" class="btn btn-primary btn-lg">Home</a>
+    </header>
+
+    <table class="table table-hover">
+    {% for d in data %}
+        <thead>
+            <tr>
+                <td colspan="2"><h4>Round {{ d["round"] }}</h4></td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <th colspan="2">Human Prompt: {{ d["real"] }}</th>
+            </tr>
+            {% for p in d["humans"] %}
+                <tr>
+                    <td>{{ p["name"] }}</td>
+                    <td><button class="btn btn-primary inflate" :style="getColor({{ p['response'] }})">${ getLevel({{ p["response"] }}) }</button></td>
+                </tr>
+            {% endfor %}
+
+            <tr>
+                <th colspan="2">Alien Prompt: {{ d["fake"] }}</th>
+            </tr>
+            {% for p in d["aliens"] %}
+                <tr>
+                    <td>{{ p["name"] }}</td>
+                    <td><button class="btn btn-primary inflate" :style="getColor({{ p['response'] }})">${ getLevel({{ p["response"] }}) }</button></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    {% endfor %}
+    </table>
+   
+
+    <script type="text/javascript">
+        Vue.component('modal', {
+            template: '#modal-template'
+        })
+    
+        var app = new Vue({
+            el: '#app',
+            delimiters: ["${","}"],
+            data: {
+            },
+            methods: {
+                getLevel: function(id){
+                    return {
+                        0: "Strongly Agree",
+                        1: "Agree",
+                        2: "Neutral",
+                        3: "Disagree",
+                        4: "Strongly Disagree" 
+                    }[id]
+                },
+                getColor: function(id){
+                    return {
+                        0: style="background-color: #00FF00; border-color: #00FF00",
+                        1: style="background-color: #1ABF26; border-color: #1ABF26",
+                        2: style="background-color: #33804D; border-color: #33804D",
+                        3: style="background-color: #4D4073; border-color: #4D4073",
+                        4: style="background-color: #660099; border-color: #660099"
+                    }[id]
+                }
+            }
+        });
+	</script>
+{% endblock %}
+{% block foot %}{% endblock %}

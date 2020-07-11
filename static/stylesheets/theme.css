@@ -1,0 +1,18 @@
+.bottom-padding{
+    margin-bottom: 10px;
+}
+.body-padding{
+    margin-top: 20px;
+}
+.btn-primary{
+    background-color: #660099;
+    border-color: #660099;
+}
+.btn-primary:disabled{
+    background-color: #b31aff;
+    border-color: #b31aff;
+}
+.btn-primary:hover{
+    background-color: #b31aff;
+    border-color: #b31aff;
+}
